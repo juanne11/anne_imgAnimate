@@ -1,15 +1,10 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>AR Penari Papua (Tanpa Background Hitam)</title>
-    <meta name="description" content="A-Frame AR Video dengan transparansi dari chroma key." />
+    <title>AR Penari Papua - Fix Transparansi & Rotasi</title>
     <meta name="apple-mobile-web-app-capable" content="yes" />
-
-    <!-- A-Frame dan AR.js -->
     <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-
-    <!-- Shader untuk hapus background warna -->
     <script src="https://cdn.jsdelivr.net/gh/mayognaise/aframe-chromakey-material/dist/aframe-chromakey-material.min.js"></script>
 
     <style>
@@ -27,9 +22,7 @@
         border-radius: 8px;
         cursor: pointer;
       }
-      #playButton:hover {
-        background: #444;
-      }
+      #playButton:hover { background: #444; }
     </style>
   </head>
 
@@ -54,17 +47,17 @@
         <a-entity
           id="videoContainer"
           position="0 0.3 0"
-          rotation="-90 0 0"
+          rotation="-90 180 0"
           scale="1.5 1.5 1.5"
-          animation="property: rotation; to: -90 360 0; loop: true; dur: 15000; easing: linear;">
+          animation="property: rotation; to: -90 540 0; loop: true; dur: 15000; easing: linear;">
           
-          <!-- Video dengan shader chroma key -->
+          <!-- Video dengan chroma key dan toleransi warna -->
           <a-video
             src="#PenariVideo"
             width="1.2"
             height="0.68"
             position="0 0 0"
-            material="shader: chromakey; color: 0 0 0; transparent: true; opacity: 1;">
+            material="shader: chromakey; color: 0.05 0.05 0.05; transparent: true; opacity: 0.95;">
           </a-video>
         </a-entity>
       </a-marker>
@@ -79,7 +72,6 @@
 
       let isPlaying = true;
 
-      // Tombol Play / Pause manual
       playButton.addEventListener("click", () => {
         if (isPlaying) {
           video.pause();
@@ -91,7 +83,6 @@
         isPlaying = !isPlaying;
       });
 
-      // Auto Play / Pause berdasarkan deteksi marker
       marker.addEventListener("markerFound", () => {
         video.play();
         playButton.textContent = "Pause";
