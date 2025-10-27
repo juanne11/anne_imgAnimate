@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>AR Video Penari Papua</title>
+    <meta name="description" content="Marker-Based AR dengan video MP4 Penari Papua auto-play, auto-rotate, dan tombol kontrol." />
+
+    <!-- A-Frame + AR.js -->
+    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+  </head>
+
+  <body style="margin: 0; overflow: hidden;">
+    <!-- Tombol kontrol -->
+    <div style="
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      display: flex;
+      gap: 10px;">
+      
+      <button id="play-button" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">
+        ▶️ Play
+      </button>
+      <button id="pause-button" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">
+        ⏸️ Pause
+      </button>
+    </div>
+
+    <!-- Scene AR -->
+    <a-scene embedded arjs>
+      <!-- Marker Hiro -->
+      <a-marker preset="hiro" id="hiroMarker">
+        <!-- Container video agar bisa dirotasi -->
+        <a-entity id="video-container" position="0 0.2 0" rotation="-90 0 0" scale="1 1 1">
+          <a-video
+            id="video"
+            src="#videoSrc"
+            width="1.5"
+            height="0.9"
+            autoplay="false"
+            loop="true"
+            position="0 0 0"
+            rotation="0 0 0"
+            muted="false">
+          </a-video>
+        </a-entity>
+      </a-marker>
+      <a-entity camera></a-entity>
+
+      <!-- Aset video -->
+      <a-assets>
+        <video id="videoSrc" src="./VideoPenariPapua.mp4" preload="auto" loop crossorigin="anonymous"></video>
+      </a-assets>
+    </a-scene>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const videoEl = document.querySelector('#videoSrc');
+        const marker = document.querySelector('#hiroMarker');
+        const videoContainer = document.querySelector('#video-container').object3D;
+        const playButton = document.getElementById('play-button');
+        const pauseButton = document.getElementById('pause-button');
+
+        let isMarkerVisible = false;
+
+        // Auto-rotation lembut agar video tampak hidup
+        function animate() {
+          requestAnimationFrame(animate);
+          if (isMarkerVisible) {
+            videoContainer.rotation.y += 0.01; // putar pelan di sumbu Y
+          }
+        }
+        animate();
+
+        // Marker ditemukan
+        marker.addEventListener('markerFound', () => {
+          console.log('Marker ditemukan — video mulai diputar');
+          isMarkerVisible = true;
+          videoEl.play().catch(err => console.log("Autoplay dicegah:", err));
+        });
+
+        // Marker hilang
+        marker.addEventListener('markerLost', () => {
+          console.log('Marker hilang — video dijeda');
+          isMarkerVisible = false;
+          videoEl.pause();
+        });
+
+        // Tombol Play/Pause manual
+        playButton.addEventListener('click', () => {
+          videoEl.play();
+          isMarkerVisible = true;
+        });
+
+        pauseButton.addEventListener('click', () => {
+          videoEl.pause();
+          isMarkerVisible = false;
+        });
+      });
+    </script>
+  </body>
+</html>
